@@ -2,7 +2,13 @@ package com.flutter_webview_plugin;
 
 import android.graphics.Bitmap;
 import android.webkit.WebView;
+import android.net.http.SslError;
 import android.webkit.WebViewClient;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +41,23 @@ public class BrowserClient extends WebViewClient {
 
         data.put("type", "finishLoad");
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
+    }
 
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        super.onReceivedError(view, request, error);
+        FlutterWebviewPlugin.channel.invokeMethod("onError","general error");
+    }
+
+    @Override
+    public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+        super.onReceivedHttpError(view, request, errorResponse);
+        FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
+    }
+
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        super.onReceivedSslError(view, handler, error);
+        FlutterWebviewPlugin.channel.invokeMethod("onError","ssl error");
     }
 }

@@ -52,6 +52,9 @@ class FlutterWebviewPlugin {
   /// Listening url changed
   Stream<String> get onUrlChanged => _onUrlChanged.stream;
 
+  /// Listeneing error web
+  Stream<String> get onError => _onError.stream;
+
   /// Listening the onState Event for iOS WebView and Android
   /// content is Map for type: {shouldStart(iOS)|startLoad|finishLoad}
   /// more detail than other events
