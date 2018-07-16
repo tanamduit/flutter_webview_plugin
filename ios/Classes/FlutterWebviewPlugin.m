@@ -181,6 +181,10 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
     [channel invokeMethod:@"onError" arguments:data];
 }
 
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation: (WKNavigation *)navigation withError:(NSError *) error{
+    [channel invokeMethod:@"onError" arguments:@"error Navigation"];
+}
+
 #pragma mark -- UIScrollViewDelegate
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if (scrollView.pinchGestureRecognizer.isEnabled != _enableZoom) {
