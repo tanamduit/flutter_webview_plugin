@@ -22,6 +22,10 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+import android.graphics.Bitmap;
+
 /**
  * Created by lejard_h on 20/12/2017.
  */
@@ -97,21 +101,6 @@ class WebviewManager {
         }
 
         webView.loadUrl(url);
-        webView.setWebViewClient(new WebViewClient(){
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
-            }
-
-            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-                Log.d("webview","error in onreceive HTTP ERror");
-                FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
-            }
-
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                Log.d("webview","error in onreceive SSL ERror");
-                FlutterWebviewPlugin.channel.invokeMethod("onError","ssl error");
-            }
-        });
     }
 
     void close(MethodCall call, MethodChannel.Result result) {
