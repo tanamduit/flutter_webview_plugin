@@ -15,7 +15,6 @@ enum WebViewState { shouldStart, startLoad, finishLoad }
 /// Have to be instanciate after `runApp` called.
 class FlutterWebviewPlugin {
   final _channel = const MethodChannel(_kChannel);
-
   final _onDestroy = new StreamController<Null>.broadcast();
   final _onUrlChanged = new StreamController<String>.broadcast();
   final _onStateChanged = new StreamController<WebViewStateChanged>.broadcast();

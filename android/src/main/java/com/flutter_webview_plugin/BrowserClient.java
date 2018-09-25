@@ -9,6 +9,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.annotation.TargetApi;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import android.util.Log;
 public class BrowserClient extends WebViewClient {
 
     boolean isGetError = false;
+    boolean isFinishingLoad = false;
 
     public BrowserClient() {
         super();
@@ -29,6 +31,7 @@ public class BrowserClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         isGetError = false;
+        isFinishingLoad = false;
         super.onPageStarted(view, url, favicon);
         Map<String, Object> data = new HashMap<>();
         data.put("url", url);
@@ -44,6 +47,7 @@ public class BrowserClient extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         if(!isGetError){
+            isFinishingLoad = true;
             Map<String, Object> data = new HashMap<>();
             data.put("url", url);
             data.put("type", "finishLoad");
@@ -52,35 +56,45 @@ public class BrowserClient extends WebViewClient {
         }
     }
     
+    @SuppressWarnings("deprecation")
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl){
-        isGetError = true;
-        super.onReceivedError(view,errorCode,description,failingUrl);
-        Log.d("webview","error in old onreceive ERror");
-        FlutterWebviewPlugin.channel.invokeMethod("onError","general error");
+        if(!isFinishingLoad){
+            isGetError = true;
+            super.onReceivedError(view,errorCode,description,failingUrl);
+            Log.d("webview","error in old onreceive ERror");
+            FlutterWebviewPlugin.channel.invokeMethod("onError","general error");
+        }
     }
 
+    @TargetApi(23)
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        isGetError = true;
-        super.onReceivedError(view, request, error);
-        Log.d("webview","error in onreceive ERror");
-        FlutterWebviewPlugin.channel.invokeMethod("onError","general error");
+        if(!isFinishingLoad){
+            isGetError = true;
+            super.onReceivedError(view, request, error);
+            Log.d("webview","error in onreceive ERror");
+            FlutterWebviewPlugin.channel.invokeMethod("onError","general error");
+        }
     }
 
     @Override
     public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-        isGetError = true;
-        super.onReceivedHttpError(view, request, errorResponse);
-        Log.d("webview","error in onreceive HTTP ERror");
-        FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
+        if(!isFinishingLoad){
+            isGetError = true;
+            super.onReceivedHttpError(view, request, errorResponse);
+            Log.d("webview","error in onreceive HTTP ERror");
+            FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
+        }
     }
 
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-        isGetError = true;
-        super.onReceivedSslError(view, handler, error);
-        Log.d("webview","error in onreceive SSL ERror");
-        FlutterWebviewPlugin.channel.invokeMethod("onError","ssl error");
+        if(!isFinishingLoad){
+            isGetError = true;
+            super.onReceivedSslError(view, handler, error);
+            Log.d("webview","error in onreceive SSL Error");
+            FlutterWebviewPlugin.channel.invokeMethod("onError","ssl error");
+        }
     }
 }
