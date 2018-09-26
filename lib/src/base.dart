@@ -121,6 +121,7 @@ class FlutterWebviewPlugin {
     _onUrlChanged.close();
     _onStateChanged.close();
     _onError.close();
+    close();
     _instance = null;
   }
 

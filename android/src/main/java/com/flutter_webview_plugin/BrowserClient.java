@@ -48,6 +48,7 @@ public class BrowserClient extends WebViewClient {
         super.onPageFinished(view, url);
         if(!isGetError){
             isFinishingLoad = true;
+            Log.d("webview","page finished");
             Map<String, Object> data = new HashMap<>();
             data.put("url", url);
             data.put("type", "finishLoad");
@@ -80,12 +81,13 @@ public class BrowserClient extends WebViewClient {
 
     @Override
     public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-        if(!isFinishingLoad){
-            isGetError = true;
-            super.onReceivedHttpError(view, request, errorResponse);
-            Log.d("webview","error in onreceive HTTP ERror");
-            FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
-        }
+        // if(!isFinishingLoad){
+        //     isGetError = true;
+        //     super.onReceivedHttpError(view, request, errorResponse);
+        //     Log.d("webview","errorResponse : "+errorResponse.getReasonPhrase());
+        //     Log.d("webview","error in onreceive HTTP ERror");
+        //     FlutterWebviewPlugin.channel.invokeMethod("onError","http error");
+        // }
     }
 
     @Override
