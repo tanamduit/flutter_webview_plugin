@@ -15,7 +15,7 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
                methodChannelWithName:CHANNEL_NAME
                binaryMessenger:[registrar messenger]];
     
-    UIViewController *viewController = (UIViewController *)registrar.messenger;
+    UIViewController *viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     FlutterWebviewPlugin* instance = [[FlutterWebviewPlugin alloc] initWithViewController:viewController];
     
     [registrar addMethodCallDelegate:instance channel:channel];
@@ -52,7 +52,6 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
 }
 
 - (void)initWebview:(FlutterMethodCall*)call {
-    NSLog(@"initiate Var");
     NSNumber *clearCache = call.arguments[@"clearCache"];
     NSNumber *clearCookies = call.arguments[@"clearCookies"];
     NSNumber *hidden = call.arguments[@"hidden"];
@@ -60,7 +59,6 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
     _enableAppScheme = call.arguments[@"enableAppScheme"];
     NSString *userAgent = call.arguments[@"userAgent"];
     NSNumber *withZoom = call.arguments[@"withZoom"];
-    NSLog(@"done initiate var");
     if (clearCache != (id)[NSNull null] && [clearCache boolValue]) {
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
     }
@@ -75,21 +73,18 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
     }
     
     CGRect rc;
-    if (rect != nil) {
+    if (rect != (id)[NSNull null]) {
         rc = [self parseRect:rect];
     } else {
         rc = self.viewController.view.bounds;
     }
-    NSLog(@"initiate webview");
     self.webview = [[WKWebView alloc] initWithFrame:rc];
     self.webview.navigationDelegate = self;
     self.webview.scrollView.delegate = self;
     self.webview.hidden = [hidden boolValue];
-    NSLog(@"done initiate webview");
     _enableZoom = [withZoom boolValue];
 
     [self.viewController.view addSubview:self.webview];
-
     [self navigate:call];
 }
 
