@@ -98,7 +98,11 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
 - (void)navigate:(FlutterMethodCall*)call {
     if (self.webview != nil) {
         NSString *url = call.arguments[@"url"];
-        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSMutableURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSDictionary *headers = call.arguments[@"headers"];
+        if (headers != nil) {
+            [request setAllHTTPHeaderFields:headers];
+        }
         [self.webview loadRequest:request];
     }
 }
@@ -171,14 +175,16 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    id data = [FlutterError errorWithCode:[NSString stringWithFormat:@"%ld", error.code]
-                                  message:error.localizedDescription
-                                  details:error.localizedFailureReason];
-    [channel invokeMethod:@"onError" arguments:data];
+    [channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
 }
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation: (WKNavigation *)navigation withError:(NSError *) error{
-    [channel invokeMethod:@"onError" arguments:@"error Navigation"];
+    if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
+        NSHTTPURLResponse * response = (NSHTTPURLResponse *)navigationResponse.response;
+
+        [channel invokeMethod:@"onHttpError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", response.statusCode], @"url": webView.URL.absoluteString}];
+    }
+    decisionHandler(WKNavigationResponsePolicyAllow);
 }
 
 #pragma mark -- UIScrollViewDelegate
