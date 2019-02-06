@@ -56,8 +56,8 @@ class WebviewManager {
                 return false;
             }
         });
-        // MyWebChromeClient chrome = new MyWebChromeClient(activity);
-        // webView.setWebChromeClient(chrome);
+        MyWebChromeClient chrome = new MyWebChromeClient(activity);
+        webView.setWebChromeClient(chrome);
         webView.setWebViewClient(webViewClient);
     }
 
